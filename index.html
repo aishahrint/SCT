@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Signal or Scam — NABULINES × Ledger</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  :root{
+    --ink:#0a0a0a;
+    --paper:#ffffff;
+    --line:#0a0a0a;
+    --mute:#8a8a8a;
+    --hair:#e4e4e4;
+    --danger:#c23b1f;
+    --safe:#0a0a0a;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Space Grotesk',sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow-x:hidden;
+  }
+  .app{
+    width:100%;
+    max-width:420px;
+    min-height:100vh;
+    padding:20px 20px 32px;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- HEADER ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:20px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .brand .eye{font-size:15px;}
+  .device-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.04em;
+    color:var(--mute);
+    border:1px solid var(--hair);
+    padding:4px 9px;
+    border-radius:20px;
+  }
+
+  /* ---------- SCREENS ---------- */
+  .screen{display:none; flex:1; flex-direction:column;}
+  .screen.active{display:flex;}
+
+  /* INTRO */
+  #intro{justify-content:space-between;}
+  .intro-top{padding-top:8px;}
+  .title-xl{
+    font-size:38px;
+    line-height:1.05;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    margin:0 0 14px;
+  }
+  .title-xl em{font-style:normal; text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px;}
+  .lede{
+    font-size:15px;
+    line-height:1.55;
+    color:#333;
+    max-width:32ch;
+  }
+  .device-strip{
+    display:flex;
+    gap:6px;
+    margin:28px 0 8px;
+  }
+  .device-strip .seg{
+    flex:1;
+    height:3px;
+    background:var(--hair);
+    border-radius:2px;
+  }
+  .device-strip .seg.done{background:var(--ink);}
+  .device-caption{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    color:var(--mute);
+    letter-spacing:0.03em;
+    margin-bottom:24px;
+  }
+  .handle-field{
+    margin-bottom:18px;
+  }
+  .handle-field label{
+    display:block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--mute);
+    margin-bottom:8px;
+  }
+  .handle-field input{
+    width:100%;
+    border:1.5px solid var(--ink);
+    background:transparent;
+    padding:13px 14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:15px;
+    color:var(--ink);
+    border-radius:4px;
+  }
+  .handle-field input:focus{outline:none; box-shadow:0 0 0 3px rgba(10,10,10,0.08);}
+  .btn{
+    width:100%;
+    padding:16px;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    letter-spacing:0.01em;
+    border-radius:4px;
+    cursor:pointer;
+  }
+  .btn:active{transform:scale(0.985);}
+  .btn.ghost{
+    background:transparent;
+    color:var(--ink);
+    border:1.5px solid var(--ink);
+  }
+
+  /* GAME */
+  #game{gap:16px;}
+  .hud{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--mute);
+    letter-spacing:0.02em;
+  }
+  .hud .score{color:var(--ink); font-weight:700;}
+  .timer-track{
+    height:3px;
+    background:var(--hair);
+    border-radius:2px;
+    overflow:hidden;
+    margin-bottom:4px;
+  }
+  .timer-fill{
+    height:100%;
+    background:var(--ink);
+    width:100%;
+    transform-origin:left;
+  }
+
+  .device-frame{
+    border:2px solid var(--ink);
+    border-radius:22px;
+    padding:22px 20px 24px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    background:var(--paper);
+    min-height:340px;
+  }
+  .device-frame::before{
+    content:'';
+    position:absolute;
+    top:10px; left:50%;
+    transform:translateX(-50%);
+    width:34px; height:4px;
+    background:var(--hair);
+    border-radius:4px;
+  }
+  .level-eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--mute);
+    margin:14px 0 6px;
+  }
+  .prompt{
+    font-size:15px;
+    line-height:1.5;
+    font-weight:500;
+    margin-bottom:16px;
+  }
+  .data-block{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    line-height:1.7;
+    background:#fafafa;
+    border:1px solid var(--hair);
+    border-radius:8px;
+    padding:14px;
+    white-space:pre-wrap;
+    word-break:break-all;
+    flex:1;
+    color:#111;
+  }
+  .data-block .flag{color:var(--danger); font-weight:700;}
+  .data-block .dim{color:var(--mute);}
+
+  .decision-row{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+  }
+  .decision-row button{
+    flex:1;
+    padding:15px 8px;
+    border-radius:4px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .btn-scam{
+    background:var(--paper);
+    border:1.5px solid var(--danger);
+    color:var(--danger);
+  }
+  .btn-safe{
+    background:var(--paper);
+    border:1.5px solid var(--ink);
+    color:var(--ink);
+  }
+  .decision-row button:active{transform:scale(0.97);}
+
+  /* FEEDBACK OVERLAY */
+  .feedback{
+    display:none;
+    flex-direction:column;
+    gap:10px;
+    animation:slideup .25s ease;
+  }
+  @keyframes slideup{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .feedback.active{display:flex;}
+  .feedback-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    font-weight:700;
+    padding:5px 10px;
+    border-radius:20px;
+    display:inline-block;
+    width:fit-content;
+  }
+  .feedback-tag.correct{background:var(--ink); color:var(--paper);}
+  .feedback-tag.wrong{background:var(--danger); color:var(--paper);}
+  .feedback-text{font-size:13.5px; line-height:1.55; color:#222;}
+  .feedback-case{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--mute);
+    border-top:1px dashed var(--hair);
+    padding-top:8px;
+  }
+
+  /* RESULT */
+  #result{justify-content:space-between;}
+  .result-card{
+    border:2px solid var(--ink);
+    border-radius:22px;
+    padding:30px 24px;
+    text-align:center;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+  }
+  .result-eye{font-size:28px; margin-bottom:8px;}
+  .result-score{
+    font-size:56px;
+    font-weight:700;
+    letter-spacing:-0.02em;
+  }
+  .result-score span{font-size:24px; color:var(--mute); font-weight:500;}
+  .result-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--mute);
+    margin-top:4px;
+  }
+  .result-handle{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    margin-top:18px;
+    color:#333;
+  }
+  .result-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:20px;
+  }
+  canvas{display:none;}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand"><span class="eye">👁️</span> NABULINES</div>
+    <div class="device-tag" id="deviceTag">NANO S PLUS</div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="screen active" id="intro">
+    <div class="intro-top">
+      <div class="title-xl">Signal<br>or <em>Scam</em>.</div>
+      <div class="lede">Five real attacks that have drained real wallets. You're holding the device. Decide fast — sign or reject.</div>
+
+      <div class="device-strip">
+        <div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+      </div>
+      <div class="device-caption">NANO S PLUS → NANO X → GEN5 → FLEX → STAX</div>
+    </div>
+
+    <div>
+      <div class="handle-field">
+        <label>Your X / Twitter handle</label>
+        <input type="text" id="handleInput" placeholder="@nabu_lines" autocomplete="off">
+      </div>
+      <button class="btn" id="startBtn">Start — Level 1</button>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div class="screen" id="game">
+    <div class="hud">
+      <span id="hudLevel">LEVEL 1 / 5</span>
+      <span class="score">SCORE <span id="hudScore">0</span></span>
+    </div>
+    <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+
+    <div class="device-frame">
+      <div class="level-eyebrow" id="levelEyebrow">ADDRESS POISONING</div>
+      <div class="prompt" id="levelPrompt"></div>
+      <div class="data-block" id="dataBlock"></div>
+
+      <div class="decision-row" id="decisionRow">
+        <button class="btn-scam" id="btnScam">⚠ SCAM</button>
+        <button class="btn-safe" id="btnSafe">✓ SAFE</button>
+      </div>
+
+      <div class="feedback" id="feedback">
+        <div class="feedback-tag" id="feedbackTag">CORRECT</div>
+        <div class="feedback-text" id="feedbackText"></div>
+        <div class="feedback-case" id="feedbackCase"></div>
+        <button class="btn" id="nextBtn" style="margin-top:6px;">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="screen" id="result">
+    <div class="result-card">
+      <div class="result-eye">👁️</div>
+      <div class="result-score"><span id="finalScore">0</span><span>/5</span></div>
+      <div class="result-label" id="resultLabel">THREATS DETECTED</div>
+      <div class="result-handle" id="resultHandle"></div>
+    </div>
+    <div class="result-actions">
+      <button class="btn" id="downloadBtn">Download result card</button>
+      <button class="btn ghost" id="shareBtn">Share on X</button>
+      <button class="btn ghost" id="retryBtn">Play again</button>
+    </div>
+  </div>
+
+</div>
+
+<canvas id="shareCanvas" width="1080" height="1080"></canvas>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if(tg){ tg.ready(); tg.expand(); }
+
+const LEVELS = [
+  {
+    device: "NANO S PLUS",
+    eyebrow: "ADDRESS POISONING",
+    prompt: "A withdrawal address appears in your recent history, matching one you've sent to before.",
+    data: "TO: 0x7A3f...................9E4c\n\nLAST USED:\n0x7A3f...................9E4c\n2 days ago — 0.4 ETH",
+    answer: "scam",
+    correct: "Same start and end characters — but that's exactly the trick. Attackers generate lookalike addresses that differ only in the hidden middle section, hoping you never check past the first and last few characters.",
+    wrong: "This is a poisoned address. It matches on the visible edges only — the middle is different. Always verify the full string, not just the ends.",
+    tag: "Ledger Academy, 2026"
+  },
+  {
+    device: "NANO X",
+    eyebrow: "UNSOLICITED DM",
+    prompt: "A message lands in your Telegram inbox from an account styled as official support.",
+    data: "FROM: @Ledger_Support_Help\n\n\"We've detected unusual activity\non your wallet. Reply with your\n24-word phrase to verify and\nsecure your funds immediately.\"",
+    answer: "scam",
+    correct: "Real support teams never make first contact, and no legitimate service ever asks for your recovery phrase — not to 'verify', not to 'secure', never.",
+    wrong: "This is a scam. Legitimate support never DMs first, and no one legitimate ever needs your 24 words to help you.",
+    tag: "Common pattern across Telegram / Discord scams"
+  },
+  {
+    device: "GEN5 / FLEX — CLEAR SIGNING UNLOCKED",
+    eyebrow: "THE PERMIT SIGNATURE",
+    prompt: "A dApp asks you to sign a 'permit' message. It looks routine — no funds seem to move.",
+    data: "SIGN MESSAGE\n\nspender: 0x9c1F...44Bb\namount: UNLIMITED\ntoken: USDC\nnonce: 118\n\n[no transaction, no gas fee]",
+    answer: "scam",
+    correct: "This is exactly how a real user lost roughly $1.76M in USDC in March 2026 — a 'permit' looks harmless because no funds move yet. It only grants permission. The theft happens later, silently, using that permission.",
+    wrong: "Permit signatures don't move funds immediately — they grant future permission. That's what makes them dangerous: this pattern caused a real $1.76M USDC loss in March 2026.",
+    tag: "Real incident — March 2026, ~$1.76M USDC"
+  },
+  {
+    device: "FLEX",
+    eyebrow: "THE FAKE REVOKE SITE",
+    prompt: "Hours after a major protocol hack, a link circulates from an ordinary-looking account: 'Revoke your approvals here before it's too late.'",
+    data: "protocolname-revoke.io\n\n\"Connect wallet to review and\nrevoke risky approvals\"",
+    answer: "scam",
+    correct: "Drainer operators watch for major hacks in real time and register lookalike 'revoke' domains within hours, spreading them through ordinary-looking accounts. Panic is the exploit — the real fix is your wallet's official revoke tool, never a link from social media.",
+    wrong: "This is a fake revoke site. After real hacks, attackers race to register lookalike domains and spread them before panicked users can think twice.",
+    tag: "Documented pattern, April 2026 wave"
+  },
+  {
+    device: "STAX",
+    eyebrow: "THE MANIPULATED INTERFACE",
+    prompt: "A routine-looking internal transfer request appears. Everything on screen reads normally.",
+    data: "TRANSFER REQUEST\n\ntype: internal / routine\namount: [displayed as expected]\ninterface: verified ✓\n\n[signing interface may not\nreflect true transaction]",
+    answer: "scam",
+    correct: "This is what happened in the largest crypto theft in history — February 2025, $1.5B in ETH. The signing interface itself had been manipulated, so what looked routine and 'verified' was actually a fraudulent transaction. Even experienced staff were fooled.",
+    wrong: "Even this 'routine, verified' transfer was fraudulent — this mirrors the $1.5B ETH theft from February 2025, where the signing interface itself was compromised.",
+    tag: "Real incident — Feb 2025, $1.5B ETH"
+  }
+];
+
+let idx = 0, score = 0, timerInterval, timeLeft, answered = false;
+let handle = "";
+
+const screens = {
+  intro: document.getElementById('intro'),
+  game: document.getElementById('game'),
+  result: document.getElementById('result'),
+};
+function show(name){
+  Object.values(screens).forEach(s=>s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  const val = document.getElementById('handleInput').value.trim();
+  handle = val ? (val.startsWith('@') ? val : '@'+val) : '@anon';
+  idx = 0; score = 0;
+  show('game');
+  loadLevel();
+});
+
+function loadLevel(){
+  answered = false;
+  const lv = LEVELS[idx];
+  document.getElementById('deviceTag').textContent = lv.device.split(' — ')[0];
+  document.getElementById('hudLevel').textContent = `LEVEL ${idx+1} / 5`;
+  document.getElementById('hudScore').textContent = score;
+  document.getElementById('levelEyebrow').textContent = lv.eyebrow;
+  document.getElementById('levelPrompt').textContent = lv.prompt;
+  document.getElementById('dataBlock').textContent = lv.data;
+  document.getElementById('decisionRow').style.display = 'flex';
+  document.getElementById('feedback').classList.remove('active');
+
+  const marks = document.querySelectorAll('.seg');
+  marks.forEach((m,i)=> m.classList.toggle('done', i < idx));
+
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft = 100;
+  const fill = document.getElementById('timerFill');
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  requestAnimationFrame(()=>{
+    fill.style.transition = 'width 8s linear';
+    fill.style.width = '0%';
+  });
+  timerInterval = setTimeout(()=>{ if(!answered) handleAnswer(null); }, 8000);
+}
+
+document.getElementById('btnScam').addEventListener('click', ()=>handleAnswer('scam'));
+document.getElementById('btnSafe').addEventListener('click', ()=>handleAnswer('safe'));
+
+function handleAnswer(choice){
+  if(answered) return;
+  answered = true;
+  clearTimeout(timerInterval);
+  const lv = LEVELS[idx];
+  const isCorrect = choice === lv.answer;
+  if(isCorrect) score++;
+
+  document.getElementById('decisionRow').style.display = 'none';
+  const fb = document.getElementById('feedback');
+  fb.classList.add('active');
+  const tag = document.getElementById('feedbackTag');
+  tag.textContent = isCorrect ? 'CORRECT' : (choice===null ? 'TOO SLOW' : 'MISSED');
+  tag.className = 'feedback-tag ' + (isCorrect ? 'correct' : 'wrong');
+  document.getElementById('feedbackText').textContent = isCorrect ? lv.correct : lv.wrong;
+  document.getElementById('feedbackCase').textContent = lv.tag;
+  document.getElementById('hudScore').textContent = score;
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  idx++;
+  if(idx >= LEVELS.length){
+    finishGame();
+  } else {
+    loadLevel();
+  }
+});
+
+function finishGame(){
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('resultHandle').textContent = handle;
+  const labels = ["ROOKIE SIGNER","GETTING SHARPER","SOLID INSTINCTS","SECURITY MINDED","CHAIN GUARDIAN"];
+  document.getElementById('resultLabel').textContent = labels[Math.max(0,score-1)] || labels[0];
+  show('result');
+}
+
+document.getElementById('retryBtn').addEventListener('click', ()=>{
+  show('intro');
+});
+
+document.getElementById('shareBtn').addEventListener('click', ()=>{
+  const text = `I detected ${score}/5 real crypto attacks in Signal or Scam. Think you'd survive self-custody? 👁️\n\nPlay: t.me/YOUR_BOT_USERNAME`;
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  if(tg && tg.openLink){ tg.openLink(url); } else { window.open(url,'_blank'); }
+});
+
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  const canvas = document.getElementById('shareCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,1080,1080);
+  ctx.strokeStyle = '#0a0a0a';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(40,40,1000,1000);
+
+  ctx.fillStyle = '#0a0a0a';
+  ctx.textAlign = 'center';
+  ctx.font = '600 32px "Space Grotesk", sans-serif';
+  ctx.fillText('👁️ NABULINES', 540, 160);
+
+  ctx.font = '700 170px "Space Grotesk", sans-serif';
+  ctx.fillText(`${score}/5`, 540, 480);
+
+  ctx.font = '600 26px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#8a8a8a';
+  const labels = ["ROOKIE SIGNER","GETTING SHARPER","SOLID INSTINCTS","SECURITY MINDED","CHAIN GUARDIAN"];
+  ctx.fillText(labels[Math.max(0,score-1)] || labels[0], 540, 540);
+
+  ctx.font = '500 24px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#333333';
+  ctx.fillText('SIGNAL OR SCAM', 540, 880);
+  ctx.fillStyle = '#8a8a8a';
+  ctx.font = '400 20px "JetBrains Mono", monospace';
+  ctx.fillText(handle || '@anon', 540, 920);
+
+  const link = document.createElement('a');
+  link.download = 'signal-or-scam-result.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+</script>
+</body>
+</html>

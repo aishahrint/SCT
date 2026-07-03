@@ -1,0 +1,12 @@
+{
+  "name": "signal-or-scam-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for the Signal or Scam Mini App game",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}
